@@ -1,9 +1,0 @@
-Final Metric Weighting and Tilt Calculation
-
-                 Group             Sub-Indicator  Group Baseline  Group Tilt (%)  New Group Weight (%)  Sub-Indicator Baseline (Internal)  Sub-Indicator Tilt (Internal, %)  New Sub-Indicator Weight (Internal, %)  Final Metric Weight (%)
-     Economic Security          Healthcare costs            25.0       16.141141             41.141141                               50.0                        -10.340633                               39.659367                16.316316
-     Economic Security Income/Poverty/Employment            25.0       16.141141             41.141141                               50.0                         10.340633                               60.340633                24.824825
-             Education                 Education            25.0       -8.483483             16.516517                              100.0                          0.000000                              100.000000                16.516517
-Location Affordability     Housing costs (Proxy)            25.0        5.130130             30.130130                               50.0                         -5.149502                               44.850498                13.513514
-Location Affordability      Transportation costs            25.0        5.130130             30.130130                               50.0                          5.149502                               55.149502                16.616617
-       Cultural - Race           Cultural - Race            25.0      -12.787788             12.212212                              100.0                          0.000000                              100.000000                12.212212

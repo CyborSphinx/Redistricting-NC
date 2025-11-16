@@ -3,46 +3,82 @@ import numpy as np
 
 # 1. Define the raw metric scores based on the aggregated poll data (Total Score).
 # These are manually aggregated from the High Point University poll data.
-raw_scores = {
+# raw_scores = {
+#     'ES_IncPovEmp': 248,     # Economic Security: Income, Poverty, Employment (Combined)
+#     # 'ES_Healthcare': 163,    # Economic Security: Healthcare costs
+#     'Education': 165,        # Education
+#     'LA_Transportation': 166, # Location Affordability: Transportation costs
+#     'LA_Housing': 135,       # Location Affordability: Housing costs (using Taxes/Inflation as proxy)
+#     'Cultural_Race': 122     # Cultural: Race/Civil Rights
+# }
+
+normalized_survey_scores = {
     'ES_IncPovEmp': 248,     # Economic Security: Income, Poverty, Employment (Combined)
-    'ES_Healthcare': 163,    # Economic Security: Healthcare costs
+    # 'ES_Healthcare': 163,    # Economic Security: Healthcare costs
     'Education': 165,        # Education
     'LA_Transportation': 166, # Location Affordability: Transportation costs
     'LA_Housing': 135,       # Location Affordability: Housing costs (using Taxes/Inflation as proxy)
     'Cultural_Race': 122     # Cultural: Race/Civil Rights
 }
 
+nc_avg_scores = {
+    'ES_Inc': 71714, # Economic Security: Income (NC 5-YEAR AVG)
+    'ES_Pov': 13.1, # Economic Security: Poverty (NC 5-YEAR AVG)
+    'ES_Emp': 4.65, # Economic Security: Unemp Rate (NC 5-YEAR AVG)
+    'Education_hs': 0.0, # Highest level of education HS
+    'Education_BS': 0.0, # Highest level at least BS
+    'Education_none': 0.0, # Did not complete high school
+    'LA_Transportation': 0.0, # Transportation cost
+    'LA_Housing': 0.0, # Housing cost
+}
+
+us_benchmark = {
+    'ES_Inc': 81660, # Economic Security: Income (US 5-YEAR AVG)
+    'ES_Pov': 11.24, # Economic Security: Poverty (US 5-YEAR AVG)
+    'ES_Emp': 4.0, # Economic Security: Unemp Rate (US TARGET)
+    'Education_hs': 0.0, # Highest level of education HS
+    'Education_BS': 0.0, # Highest level at least BS
+    'Education_none': 0.0, # Did not complete high school
+    'LA_Transportation': 0.0, # Transportation cost
+    'LA_Housing': 0.0, # Housing cost
+}
+
 # Define the groupings and baselines for the calculations
 group_metrics = {
-    'Economic Security': ['ES_IncPovEmp', 'ES_Healthcare'],
-    'Education': ['Education'],
+    'Economic Security': ['ES_Inc', 'ES_Pov', 'ES_Emp'], #, 'ES_Healthcare'],
+    'Education': ['Education_hs', 'Education_BS', 'Education_none'],
     'Location Affordability': ['LA_Transportation', 'LA_Housing'],
-    'Cultural - Race': ['Cultural_Race']
+    'Cultural': ['Cultural_Race']
 }
 
 GROUP_BASELINE = 0.25 # 25% for each of the 4 groups (0.25)
 
 # 2. Calculate the Group Tilts and New Group Weights
 group_data = {}
-grand_total_score = sum(raw_scores.values())
+# grand_total_score = sum(raw_scores.values())
 
 for group, metrics in group_metrics.items():
     # Calculate the total score for the group
-    group_score = sum(raw_scores[metric] for metric in metrics)
+    # group_score = sum(raw_scores[metric] for metric in metrics)
     
-    # Calculate the Target Group Weight
-    target_group_weight = group_score / grand_total_score
-    
-    # Calculate the Group Tilt
-    group_tilt = target_group_weight - GROUP_BASELINE
+    # # Calculate the Target Group Weight
+    # target_group_weight = group_score / grand_total_score
+    target_group_weight = normalized_survey_scores[metrics]
+    # Calculate the Group Tilt from Polls
+    group_tilt_poll = target_group_weight - GROUP_BASELINE
+
+    group_tilt_avg = 0
+    if not metrics == 'Cultural':
+        # Calculate the Group Tilt of economic security from NC averages
+        group_tilt_avg = (nc_avg_scores[metrics] - us_benchmark[metrics])/us_benchmark[metrics]
     
     # Calculate the New Group Weight
-    new_group_weight = GROUP_BASELINE + group_tilt
+    new_group_weight = GROUP_BASELINE + group_tilt_poll + group_tilt_avg
     
     group_data[group] = {
-        'Group Total Score': group_score,
+        'Group Normalized Score': group_score,
         'Target Group Weight': target_group_weight,
-        'Group Tilt': group_tilt,
+        'Group Tilt from Survey': group_tilt_poll,
         'New Group Weight': new_group_weight,
         'Metrics': {}
     }
@@ -138,3 +174,7 @@ print(f"Successfully created and saved the table to: {txt_filename}")
 # Print the content of the TXT file for review
 print("\n--- Content of metric_weights_and_tilts.txt ---\n")
 print(txt_content)
+
+
+
+
